@@ -1,40 +1,20 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { pipeline } from '@xenova/transformers';
-import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
-import { cosineSimilarity } from '$lib/util/mathisfrickingstupid.js'; 
+import { cosineSimilarity } from '$lib/util/mathisfrickingstupid.js';
+
+// tungtungtungtungtung sahur
+import tungtungtungsahur from '$lib/static-chunks/tungtungsahur.json' with { type: 'json' };
 
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-// Path to the parsed handbook stored in the `$lib/parsed-handbook` folder
-const PARSED_HANDBOOK_PATH = path.resolve('src/lib/parsed-handbook/stopreadingthesourcecode.txt');
-
-let handbookChunks: string[] = [];
 let handbookEmbeddings: number[][] = [];
 let extractor: any;
 
-// Load text chunks from the parsed handbook file
-async function loadTextChunks(): Promise<string[]> {
-  if (fs.existsSync(PARSED_HANDBOOK_PATH)) {
-    const fullText = fs.readFileSync(PARSED_HANDBOOK_PATH, 'utf-8');
-    const words = fullText.split(/\s+/);
-    const maxWords = 500;
-    const chunks: string[] = [];
-
-    for (let i = 0; i < words.length; i += maxWords) {
-      chunks.push(words.slice(i, i + maxWords).join(' '));
-    }
-
-    return chunks;
-  } else {
-    throw new Error(`Parsed handbook file not found at ${PARSED_HANDBOOK_PATH}`);
-  }
-}
-
+// Generate embeddings using transformers
 async function embedChunks(chunks: string[]): Promise<number[][]> {
   extractor = extractor || (await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2'));
   const embeddings: number[][] = [];
@@ -43,44 +23,74 @@ async function embedChunks(chunks: string[]): Promise<number[][]> {
     const output = await extractor(chunk, { pooling: 'mean', normalize: true });
     embeddings.push(output.data);
   }
+
   return embeddings;
 }
 
+// Pls don't steal my source code :(
 async function retrieveTopK(question: string, k = 3): Promise<string[]> {
   const qEmbedding = (await extractor(question, { pooling: 'mean', normalize: true })).data;
-  const similarities = handbookEmbeddings.map((vec) => cosineSimilarity(vec, qEmbedding));  // Use cosine similarity here
+  const similarities = handbookEmbeddings.map((vec) => cosineSimilarity(vec, qEmbedding));
   const topKIndices = similarities
     .map((sim, i) => [sim, i] as const)
-    .sort((a, b) => b[0] - a[0])  
+    .sort((a, b) => b[0] - a[0])
     .slice(0, k)
-    .map(([, i]) => i);  
-  return topKIndices.map((i) => handbookChunks[i]); 
+    .map(([, i]) => i);
+
+  return topKIndices.map((i) => tungtungtungsahur[i]);
 }
 
+// Initialize embeddings once
 async function init() {
-  if (!handbookChunks.length) {
-    handbookChunks = await loadTextChunks();
-    handbookEmbeddings = await embedChunks(handbookChunks);
+  if (!handbookEmbeddings.length) {
+    handbookEmbeddings = await embedChunks(tungtungtungsahur);
   }
 }
 
 export const POST: RequestHandler = async ({ request }) => {
-  const { question } = await request.json();
-
   try {
+    const { question, brainrotMode } = await request.json();
+
+    if (question === 'ping6969lol') {
+      return new Response(JSON.stringify({ answer: null }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     await init();
-    const topChunks = await retrieveTopK(question); 
-    const prompt = `
+    const topChunks = await retrieveTopK(question);
+
+    let prompt = `
 You are a Lasallian student disciplinary officer.
 Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
-Use hood slang but be factual.
+Be factual.
 
 --- Handbook Context ---
 ${topChunks.join('\n\n')}
 
 --- Student Question ---
 ${question}
+
+If there is an error say "I errored, please try again, if the error persists, please try again later."
 `;
+
+    if (brainrotMode) {
+      prompt = `
+You are a Lasallian student disciplinary officer.
+Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
+Please use context clues from the handbook to support your answer.
+Make the response ghetto or from da hood.
+
+--- Handbook Context ---
+${topChunks.join('\n\n')}
+
+--- Student Question ---
+${question}
+
+If there is an error say "sorry homie, an error happened, try now, try later, idrc."
+`;
+    }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
@@ -90,8 +100,10 @@ ${question}
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
+
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error('RAG Handler Error:', err);
+    return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
