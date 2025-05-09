@@ -57,7 +57,7 @@
       sendMessage(prompt);
     }
 
-    async function sendMessage(prompt: string) {
+    async function sendMessage(prompt: any) {
   if (!prompt.trim() || loading || outOfApiCalls) return; // ✅ prevent multiple sends
   showPromptButtons = false;
   addMessage({ role: 'user', content: prompt });
@@ -269,10 +269,6 @@
   }
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-out;
-  }
-
-  html {
-    scroll-behavior: smooth;
   }
 
   /* Custom Scrollbar Styling */
