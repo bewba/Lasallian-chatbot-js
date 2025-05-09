@@ -11,7 +11,7 @@
     let brainrotMode = false; 
     let outOfApiCalls = false;
 
-
+    // PLEASE GIVE ME AN INTERNSHIP
     const samplePrompts = [
       "What's the dress code policy?",
       "How do I qualify for Latin Honors?",
@@ -86,7 +86,7 @@
       brainrotMode = !brainrotMode;
     }
 
-    // Handle Enter key press
+    // ugly ahh indention
     function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();

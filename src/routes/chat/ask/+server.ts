@@ -1,45 +1,18 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { pipeline } from '@xenova/transformers';
-import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
 import { cosineSimilarity } from '$lib/util/mathisfrickingstupid.js';
+
+// tungtungtungtungtung sahur
+import tungtungtungsahur from '$lib/static-chunks/tungtungsahur.json' with { type: 'json' };
 
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const PARSED_HANDBOOK_PATH = path.resolve('src/lib/parsed-handbook/stopreadingthesourcecode.txt');
 
-let handbookChunks: string[] = [];
 let handbookEmbeddings: number[][] = [];
 let extractor: any;
-
-const CHUNKED_PATH = path.join('static', 'tungtungsahur.json');
-
-async function loadTextChunks(): Promise<string[]> {
-  if (fs.existsSync(CHUNKED_PATH)) {
-    return JSON.parse(fs.readFileSync(CHUNKED_PATH, 'utf-8'));
-  }
-
-  // Fallback: read raw file and chunk
-  if (!fs.existsSync(PARSED_HANDBOOK_PATH)) {
-    throw new Error(`Parsed handbook file not found at ${PARSED_HANDBOOK_PATH}`);
-  }
-
-  const fullText = fs.readFileSync(PARSED_HANDBOOK_PATH, 'utf-8');
-  const words = fullText.split(/\s+/);
-  const maxWords = 500;
-  const chunks: string[] = [];
-
-  for (let i = 0; i < words.length; i += maxWords) {
-    chunks.push(words.slice(i, i + maxWords).join(' '));
-  }
-
-  fs.writeFileSync(CHUNKED_PATH, JSON.stringify(chunks), 'utf-8'); // ✅ Save for future use
-  return chunks;
-}
-
 
 // Generate embeddings using transformers
 async function embedChunks(chunks: string[]): Promise<number[][]> {
@@ -54,7 +27,7 @@ async function embedChunks(chunks: string[]): Promise<number[][]> {
   return embeddings;
 }
 
-// Retrieve the top-k most relevant chunks for the given question
+// Pls don't steal my source code :(
 async function retrieveTopK(question: string, k = 3): Promise<string[]> {
   const qEmbedding = (await extractor(question, { pooling: 'mean', normalize: true })).data;
   const similarities = handbookEmbeddings.map((vec) => cosineSimilarity(vec, qEmbedding));
@@ -64,14 +37,13 @@ async function retrieveTopK(question: string, k = 3): Promise<string[]> {
     .slice(0, k)
     .map(([, i]) => i);
 
-  return topKIndices.map((i) => handbookChunks[i]);
+  return topKIndices.map((i) => tungtungtungsahur[i]);
 }
 
-// Load chunks and embeddings once
+// Initialize embeddings once
 async function init() {
-  if (!handbookChunks.length) {
-    handbookChunks = await loadTextChunks();
-    handbookEmbeddings = await embedChunks(handbookChunks);
+  if (!handbookEmbeddings.length) {
+    handbookEmbeddings = await embedChunks(tungtungtungsahur);
   }
 }
 
@@ -79,7 +51,6 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const { question, brainrotMode } = await request.json();
 
-    // Special health-check ping
     if (question === 'ping6969lol') {
       return new Response(JSON.stringify({ answer: null }), {
         status: 200,
