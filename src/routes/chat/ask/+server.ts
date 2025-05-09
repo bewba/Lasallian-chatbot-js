@@ -15,23 +15,31 @@ let handbookChunks: string[] = [];
 let handbookEmbeddings: number[][] = [];
 let extractor: any;
 
-// Load and chunk the handbook into 500-word pieces
+const CHUNKED_PATH = path.join('static', 'tungtungsahur.json');
+
 async function loadTextChunks(): Promise<string[]> {
-  if (fs.existsSync(PARSED_HANDBOOK_PATH)) {
-    const fullText = fs.readFileSync(PARSED_HANDBOOK_PATH, 'utf-8');
-    const words = fullText.split(/\s+/);
-    const maxWords = 500;
-    const chunks: string[] = [];
+  if (fs.existsSync(CHUNKED_PATH)) {
+    return JSON.parse(fs.readFileSync(CHUNKED_PATH, 'utf-8'));
+  }
 
-    for (let i = 0; i < words.length; i += maxWords) {
-      chunks.push(words.slice(i, i + maxWords).join(' '));
-    }
-
-    return chunks;
-  } else {
+  // Fallback: read raw file and chunk
+  if (!fs.existsSync(PARSED_HANDBOOK_PATH)) {
     throw new Error(`Parsed handbook file not found at ${PARSED_HANDBOOK_PATH}`);
   }
+
+  const fullText = fs.readFileSync(PARSED_HANDBOOK_PATH, 'utf-8');
+  const words = fullText.split(/\s+/);
+  const maxWords = 500;
+  const chunks: string[] = [];
+
+  for (let i = 0; i < words.length; i += maxWords) {
+    chunks.push(words.slice(i, i + maxWords).join(' '));
+  }
+
+  fs.writeFileSync(CHUNKED_PATH, JSON.stringify(chunks), 'utf-8'); // ✅ Save for future use
+  return chunks;
 }
+
 
 // Generate embeddings using transformers
 async function embedChunks(chunks: string[]): Promise<number[][]> {
