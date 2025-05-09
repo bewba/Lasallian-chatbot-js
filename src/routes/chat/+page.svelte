@@ -27,7 +27,6 @@
     return;
   }
 
-  // 🔥 Warm up Gemini backend
   await fetch('/chat/ask', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -91,7 +90,7 @@
     function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    if (loading) return; // ✅ prevent sending while already processing
+    if (loading) return; 
     let prompt = input;
     input = '';
     sendMessage(prompt);
