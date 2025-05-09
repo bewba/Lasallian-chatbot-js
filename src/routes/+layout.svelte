@@ -1,11 +1,14 @@
 <script lang="ts">
 	import '../app.css';
 	import { dev } from '$app/environment';
-	import { injectAnalytics } from '@vercel/analytics/sveltekit';
-	
-	injectAnalytics({ mode: dev ? 'development' : 'production' });
-
-	let { children } = $props();
-</script>
-
-{@render children()}
+  
+	// Only run this in the browser
+	if (typeof window !== 'undefined') {
+	  import('@vercel/analytics/sveltekit').then(({ injectAnalytics }) => {
+		injectAnalytics({ mode: dev ? 'development' : 'production' });
+	  });
+	}
+  </script>
+  
+  <slot />
+  
