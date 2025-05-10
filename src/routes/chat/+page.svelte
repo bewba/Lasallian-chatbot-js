@@ -102,37 +102,63 @@
 <svelte:head>
   <title>ArcherAsks</title>
   <meta name="description" content="ArcherAsks - A student made AI-powered chatbot to answer all your student handbook related queries" />
+  <link rel="icon" href="/favicon.ico" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ArcherAsks" />
+    <meta property="og:description" content="A student-made AI chatbot answering questions from the Lasallian student handbook." />
+    <meta property="og:image" content="https://archerasks.vercel.app/chat/preview.png" />
+    <meta property="og:url" content="https://archerasks.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
   <div class={`h-screen w-full flex flex-col transition-colors duration-200 ${$isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-    <header class="bg-[#006937] text-white py-6 px-4 shadow-lg relative">
-      <div class="max-w-4xl mx-auto flex justify-between items-start">
+    <header class="bg-[#006937] text-white py-4 px-4 shadow-lg">
+      <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-y-4">
+        <!-- Title -->
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold flex items-center gap-3">
           <span class="text-4xl">📘</span> Which DLSU rule am I breaking?
         </h1>
-        <div class="flex items-center gap-2 mt-1">
-          <button on:click={() => showModal = true} class="text-sm underline hover:text-green-200">Terms & Conditions</button>
-          <button on:click={toggleTheme} class="p-2 rounded-lg hover:bg-[#005128] hover:cursor-pointer transition-colors duration-200" aria-label="Toggle theme">
+    
+        <!-- Right Side Actions -->
+        <div class="flex items-center gap-2 sm:gap-4">
+          <!-- Terms -->
+          <button on:click={() => showModal = true}
+            class="text-sm underline hover:text-green-200 whitespace-nowrap">
+            Terms & Conditions
+          </button>
+    
+          <!-- Dark Mode Toggle -->
+          <button on:click={toggleTheme}
+            class="p-2 rounded-lg hover:bg-[#005128] transition-colors duration-200"
+            aria-label="Toggle theme">
             {#if $isDarkMode}
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             {:else}
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
             {/if}
           </button>
-          <button on:click={toggleBrainrotMode} class="text-sm hover:cursor-pointer hover:bg-[#005128] hover:text-red-200 flex items-center gap-2">
+    
+          <!-- Brainrot Toggle -->
+          <button on:click={toggleBrainrotMode}
+            class="text-sm sm:text-md px-3 py-2 rounded-lg hover:bg-[#005128] transition-colors duration-200">
             {#if brainrotMode}
-              😎
+              😎 Swag Mode
             {:else}
-              🧠
+              🧠 Nerd Mode
             {/if}
           </button>
         </div>
       </div>
     </header>
+    
 
     <main class="flex flex-col flex-1 w-full mx-auto px-12 py-4 gap-4 overflow-hidden">
       <div bind:this={chatContainer} class={`flex-1 w-full overflow-y-auto px-1 py-2 space-y-4 rounded-lg shadow-inner ${$isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
@@ -200,54 +226,57 @@
     </main>
 
     {#if showModal}
-      <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
-        <div class="bg-white dark:bg-gray-800 max-w-2xl w-full p-6 rounded-2xl shadow-xl relative animate-fadeIn">
-          <button class="absolute top-3 right-4 text-xl font-bold hover:text-red-500" on:click={() => showModal = false}>&times;</button>
-          <h2 class="text-xl font-bold mb-4">Terms and Conditions</h2>
-          <p class="text-sm mb-4">Last updated: May 9, 2025</p>
-          <div class="space-y-4 text-sm leading-relaxed">
-            <div>
-              <h3 class="font-semibold">1. Use of the Service</h3>
-              <ul class="list-disc ml-5">
-                <li>This Service is intended to provide helpful responses based on the Lasallian student handbook.</li>
-                <li>It is <strong>not a substitute</strong> for official guidance from school administration or disciplinary officers.</li>
-                <li>You are solely responsible for how you use the information provided.</li>
-              </ul>
-            </div>
-            <div>
-              <h3 class="font-semibold">2. Data Handling</h3>
-              <ul class="list-disc ml-5">
-                <li>No user data is stored or shared. Questions and responses are processed live and are not retained.</li>
-                <li>The only data stored is how many users visit the site and how long they stay (for resume purposes).</li>
-              </ul>
-            </div>
-            <div>
-              <h3 class="font-semibold">3. Intellectual Property</h3>
-              <ul class="list-disc ml-5">
-                <li>All content generated by this Service is © 2025 Hans Emilio M. Lumagui.</li>
-                <li>You may not copy, redistribute, or use this chatbot’s content for commercial purposes without written permission.</li>
-              </ul>
-            </div>
-            <div>
-              <h3 class="font-semibold">4. Limitations of Liability</h3>
-              <ul class="list-disc ml-5">
-                <li>The Service is provided “as is” without warranties of any kind.</li>
-                <li>The creator is <strong>not liable</strong> for any actions taken based on the chatbot’s output.</li>
-                <li>Use at your own discretion.</li>
-              </ul>
-            </div>
-            <div>
-              <h3 class="font-semibold">5. Changes</h3>
-              <ul class="list-disc ml-5">
-                <li>Terms may be updated at any time. Continued use of the Service means you accept the updated terms.</li>
-              </ul>
-            </div>
-            <p>If you have questions or concerns, contact: <strong>hans_lumagui@dlsu.edu.ph</strong></p>
-            <p class="italic text-xs">Note from the creator: if this sucks, it’s cuz I speedran this.</p>
-          </div>
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 sm:px-0">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-2xl shadow-xl relative animate-fadeIn max-h-[90vh] overflow-y-auto">    
+      <button class="absolute top-3 right-4 text-xl font-bold hover:text-red-500" on:click={() => showModal = false}>&times;</button>
+      <h2 class="text-xl font-bold mb-4">Terms and Conditions</h2>
+      <p class="text-sm mb-4">Last updated: May 9, 2025</p>
+      <div class="space-y-4 text-sm leading-relaxed">
+        <div>
+          <h3 class="font-semibold">1. Use of the Service</h3>
+          <ul class="list-disc ml-5">
+            <li>This Service is intended to provide helpful responses based on the Lasallian student handbook.</li>
+            <li>It is <strong>not a substitute</strong> for official guidance from school administration or disciplinary officers.</li>
+            <li>You are solely responsible for how you use the information provided.</li>
+            <li>By using this Service, you agree to not hold the creator liable for any consequences arising from its use.</li>
+            <li>Do not spam the bot with requests</li>
+          </ul>
         </div>
+        <div>
+          <h3 class="font-semibold">2. Data Handling</h3>
+          <ul class="list-disc ml-5">
+            <li>No user data is stored or shared. Questions and responses are processed live and are not retained.</li>
+            <li>The only data stored is how many users visit the site and how long they stay (for resume purposes).</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold">3. Intellectual Property</h3>
+          <ul class="list-disc ml-5">
+            <li>All content generated by this Service is © 2025 Hans Emilio M. Lumagui.</li>
+            <li>You may not copy, redistribute, or use this chatbot’s content for commercial purposes without written permission.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold">4. Limitations of Liability</h3>
+          <ul class="list-disc ml-5">
+            <li>The Service is provided “as is” without warranties of any kind.</li>
+            <li>The creator is <strong>not liable</strong> for any actions taken based on the chatbot’s output.</li>
+            <li>Use at your own discretion.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold">5. Changes</h3>
+          <ul class="list-disc ml-5">
+            <li>Terms may be updated at any time. Continued use of the Service means you accept the updated terms.</li>
+          </ul>
+        </div>
+        <p>If you have questions or concerns, contact: <strong>hans_lumagui@dlsu.edu.ph</strong></p>
+        <p class="italic text-xs">Note from the creator: if this sucks, it’s cuz I speedran this.</p>
       </div>
-    {/if}
+    </div>
+  </div>
+{/if}
+
   </div>
 
   {#if outOfApiCalls}
