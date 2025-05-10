@@ -96,8 +96,10 @@
 
 
 <svelte:head>
-  <title>ArcherAsks</title>
-  <meta name="description" content="ArcherAsks - A student made AI-powered chatbot to answer all your student handbook related queries" />
+  <title>ArcherAsks – Smart Q&A for Students</title>
+  <meta name="description" content="Ask questions about the Lasallian Handbook and get instant, AI-powered answers." />
+  <meta name="keywords" content="Lasallian Handbook, DLSU Handbook, ArcherAsks, ArcherAsk" />
+
   <link rel="icon" href="/favicon.ico" />
 
     <!-- Open Graph Meta Tags -->
