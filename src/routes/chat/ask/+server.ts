@@ -4,32 +4,27 @@ import { pipeline } from '@xenova/transformers';
 import dotenv from 'dotenv';
 import { cosineSimilarity } from '$lib/util/mathisfrickingstupid.js';
 
-// tungtungtungtungtung sahur
-import tungtungtungsahur from '$lib/static-chunks/tungtungsahur.json' with { type: 'json' };
+// Load chunks and embeddings
+import handbookChunks from '$lib/chunks/chunks.json' with { type: 'json' };
+import tralaleroTralala from '$lib/embeddings/embeddings.json' with { type: 'json' };
+
+// Type the handbookEmbeddings after import
+const handbookEmbeddings: number[][] = tralaleroTralala as number[][];
 
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-let handbookEmbeddings: number[][] = [];
 let extractor: any;
 
-// Generate embeddings using transformers
-async function embedChunks(chunks: string[]): Promise<number[][]> {
-  extractor = extractor || (await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2'));
-  const embeddings: number[][] = [];
-
-  for (const chunk of chunks) {
-    const output = await extractor(chunk, { pooling: 'mean', normalize: true });
-    embeddings.push(output.data);
-  }
-
-  return embeddings;
-}
-
-// Pls don't steal my source code :(
 async function retrieveTopK(question: string, k = 3): Promise<string[]> {
-  const qEmbedding = (await extractor(question, { pooling: 'mean', normalize: true })).data;
+  extractor = extractor || (await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2'));
+
+  const output = await extractor(question, { pooling: 'mean', normalize: true });
+
+  const qEmbedding = Array.isArray(output.data)
+    ? output.data.flat()
+    : Array.from(output.data);
+
   const similarities = handbookEmbeddings.map((vec) => cosineSimilarity(vec, qEmbedding));
   const topKIndices = similarities
     .map((sim, i) => [sim, i] as const)
@@ -37,14 +32,9 @@ async function retrieveTopK(question: string, k = 3): Promise<string[]> {
     .slice(0, k)
     .map(([, i]) => i);
 
-  return topKIndices.map((i) => tungtungtungsahur[i]);
-}
+  console.log(topKIndices.map((i) => handbookChunks[i]))
 
-// Initialize embeddings once
-async function init() {
-  if (!handbookEmbeddings.length) {
-    handbookEmbeddings = await embedChunks(tungtungtungsahur);
-  }
+  return topKIndices.map((i) => handbookChunks[i]);
 }
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -58,13 +48,13 @@ export const POST: RequestHandler = async ({ request }) => {
       });
     }
 
-    await init();
     const topChunks = await retrieveTopK(question);
 
     let prompt = `
 You are a Lasallian student disciplinary officer.
 Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
-Be factual.
+Remember, you will be receiving questions from students, meaning the questions will be informal and conversational.
+Please use context clues from the handbook to support your answer.
 
 --- Handbook Context ---
 ${topChunks.join('\n\n')}
@@ -79,6 +69,7 @@ If there is an error say "I errored, please try again, if the error persists, pl
       prompt = `
 You are a Lasallian student disciplinary officer.
 Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
+Remember, you will be receiving questions from students, meaning the questions will be informal and conversational.
 Please use context clues from the handbook to support your answer.
 Make the response ghetto or from da hood.
 
@@ -100,10 +91,9 @@ If there is an error say "sorry homie, an error happened, try now, try later, id
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-
   } catch (err: any) {
     console.error('RAG Handler Error:', err);
-    return new Response(JSON.stringify({ error: err.message || 'Internal server error' }), {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
