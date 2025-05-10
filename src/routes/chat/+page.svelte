@@ -1,103 +1,99 @@
-  <script lang="ts">
-    import { onMount } from 'svelte';
-    import { addMessage, messages } from '$lib/stores/chat.js';
-    import { isDarkMode, toggleTheme } from '$lib/stores/theme.js';
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { addMessage, messages } from '$lib/stores/chat.js';
+  import { isDarkMode, toggleTheme } from '$lib/stores/theme.js';
 
-    $: input = '';
-    let loading = false;
-    let chatContainer: HTMLDivElement;
-    let showModal = false;
-    let showPromptButtons = true;
-    let brainrotMode = false; 
-    let outOfApiCalls = false;
 
-    // PLEASE GIVE ME AN INTERNSHIP
-    const samplePrompts = [
-      "What's the dress code policy?",
-      "How do I qualify for Latin Honors?",
-    ];
+  let input: string = '';
+  let loading = false;
+  let chatContainer: HTMLDivElement;
+  let showModal = false;
+  let showPromptButtons = true;
+  let brainrotMode = false;
+  let outOfApiCalls = false;
 
-    onMount(async () => {
-  scrollToBottom();
+  const samplePrompts = [
+    "What's the dress code policy?",
+    "How do I qualify for Latin Honors?",
+  ];
 
-  const check = await fetch('/chat/status');
-  const { outOfCalls } = await check.json();
-  if (outOfCalls) {
-    outOfApiCalls = true;
-    return;
-  }
+  onMount(async () => {
+    scrollToBottom();
 
-  await fetch('/chat/ask', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question: 'ping6969lol', brainrotMode: false }),
+    const check = await fetch('/chat/status');
+    const { outOfCalls } = await check.json();
+    if (outOfCalls) {
+      outOfApiCalls = true;
+      return;
+    }
+
+    await fetch('/chat/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: 'ping6969lol', brainrotMode: false })
+    });
+
+    setTimeout(() => {
+      const textarea = document.querySelector('textarea');
+      if (textarea) textarea.focus();
+    }, 100);
   });
 
-  setTimeout(() => {
-    const textarea = document.querySelector('textarea');
-    if (textarea) textarea.focus();
-  }, 100);
-});
-
-
-
-    $: if ($messages) {
-      setTimeout(scrollToBottom, 100);
-    }
-
-    function scrollToBottom() {
-      if (chatContainer) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-    }
-
-    function useSamplePrompt(prompt: string) {
-      showPromptButtons = false;
-      input = ''
-      sendMessage(prompt);
-    }
-
-    async function sendMessage(prompt: any) {
-  if (!prompt.trim() || loading || outOfApiCalls) return; // ✅ prevent multiple sends
-  showPromptButtons = false;
-  addMessage({ role: 'user', content: prompt });
-  loading = true;
-
-  const res = await fetch('/chat/ask', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question: prompt, brainrotMode })
-  });
-
-  const { answer, error } = await res.json();
-  loading = false;
-
-  if (error?.includes('out of API calls')) {
-    outOfApiCalls = true;
-    return;
+  $: if ($messages) {
+    setTimeout(scrollToBottom, 100);
   }
 
-  addMessage({ role: 'assistant', content: error || answer });
-  input = '';
-}
-
-
-    function toggleBrainrotMode() {
-      brainrotMode = !brainrotMode;
+  function scrollToBottom() {
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
+  }
 
-    // ugly ahh indention
-    function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    if (loading) return; 
-    let prompt = input;
-    input = '';
+  function useSamplePrompt(prompt: string) {
+    showPromptButtons = false;
+    input = prompt;
     sendMessage(prompt);
   }
-}
 
+  async function sendMessage(garbage?: any) {
+    if (input.length < 1) return;
+
+    let messageToSend = input
+
+    showPromptButtons = false;
+    addMessage({ role: 'user', content: messageToSend });
+    loading = true;
+    input = '';
+
+    const res = await fetch('/chat/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: messageToSend, brainrotMode })
+    });
+
+    const { answer, error } = await res.json();
+    loading = false;
+
+    if (error?.includes('out of API calls')) {
+      outOfApiCalls = true;
+      return;
+    }
+
+    addMessage({ role: 'assistant', content: error || answer });
+  }
+
+  function toggleBrainrotMode() {
+    brainrotMode = !brainrotMode;
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
 </script>
+
 
 <svelte:head>
   <title>ArcherAsks</title>
@@ -114,51 +110,51 @@
 </svelte:head>
 
   <div class={`h-screen w-full flex flex-col transition-colors duration-200 ${$isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-    <header class="bg-[#006937] text-white py-4 px-4 shadow-lg">
-      <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-y-4">
-        <!-- Title -->
-        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold flex items-center gap-3">
-          <span class="text-4xl">📘</span> Which DLSU rule am I breaking?
-        </h1>
-    
-        <!-- Right Side Actions -->
-        <div class="flex items-center gap-2 sm:gap-4">
-          <!-- Terms -->
-          <button on:click={() => showModal = true}
-            class="text-sm underline hover:text-green-200 whitespace-nowrap">
-            Terms & Conditions
-          </button>
-    
-          <!-- Dark Mode Toggle -->
-          <button on:click={toggleTheme}
-            class="p-2 rounded-lg hover:bg-[#005128] transition-colors duration-200"
-            aria-label="Toggle theme">
-            {#if $isDarkMode}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            {:else}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            {/if}
-          </button>
-    
-          <!-- Brainrot Toggle -->
-          <button on:click={toggleBrainrotMode}
-            class="text-sm sm:text-md px-3 py-2 rounded-lg hover:bg-[#005128] transition-colors duration-200">
-            {#if brainrotMode}
-              😎 Swag Mode
-            {:else}
-              🧠 Nerd Mode
-            {/if}
-          </button>
-        </div>
-      </div>
-    </header>
-    
+<header class="bg-[#006937] text-white py-4 px-4 shadow-lg">
+  <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-y-4">
+    <!-- Title -->
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold flex items-center gap-3">
+      <span class="text-4xl">📘</span> Which DLSU rule am I breaking?
+    </h1>
+
+    <!-- Right Side Actions -->
+    <div class="flex items-center gap-2 sm:gap-4">
+      <!-- Terms -->
+      <button on:click={() => showModal = true}
+        class="text-sm underline hover:text-green-200 whitespace-nowrap">
+        Terms & Conditions
+      </button>
+
+      <!-- Dark Mode Toggle -->
+      <button on:click={toggleTheme}
+        class="p-2 rounded-lg hover:bg-[#005128] transition-colors duration-200"
+        aria-label="Toggle theme">
+        {#if $isDarkMode}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        {:else}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        {/if}
+      </button>
+
+      <!-- Brainrot Toggle -->
+      <button on:click={toggleBrainrotMode}
+        class="text-sm sm:text-md px-3 py-2 rounded-lg hover:bg-[#005128] transition-colors duration-200">
+        {#if brainrotMode}
+          😎 Swag Mode
+        {:else}
+          🧠 Nerd Mode
+        {/if}
+      </button>
+    </div>
+  </div>
+</header>
+
 
     <main class="flex flex-col flex-1 w-full mx-auto px-12 py-4 gap-4 overflow-hidden">
       <div bind:this={chatContainer} class={`flex-1 w-full overflow-y-auto px-1 py-2 space-y-4 rounded-lg shadow-inner ${$isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
@@ -213,7 +209,7 @@
             on:keydown={handleKeydown}
           ></textarea>
           <button type="submit" class="bg-[#006937] hover:bg-[#005128] text-white py-3 px-6 rounded-xl font-semibold text-base md:text-lg transition-all duration-200
-            disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:scale-[1.02]">
+            disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] cursor-pointer">
             {loading ? 'Sending...' : 'Send Message'}
             {#if !loading}
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

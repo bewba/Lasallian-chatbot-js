@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const topChunks = await retrieveTopK(question);
 
     let prompt = `
-You are a Lasallian student disciplinary officer.
+You are a Chatbot who mastered almost everything there is to know about the student handbook.
 Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
 Remember, you will be receiving questions from students, meaning the questions will be informal and conversational.
 Please use context clues from the handbook to support your answer.
@@ -67,7 +67,7 @@ If there is an error say "I errored, please try again, if the error persists, pl
 
     if (brainrotMode) {
       prompt = `
-You are a Lasallian student disciplinary officer.
+You are a Chatbot who mastered almost everything there is to know about the student handbook.
 Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
 Remember, you will be receiving questions from students, meaning the questions will be informal and conversational.
 Please use context clues from the handbook to support your answer.
