@@ -97,7 +97,12 @@
   }
 }
 
-  </script>
+</script>
+
+<svelte:head>
+  <title>ArcherAsks</title>
+  <meta name="description" content="ArcherAsks - A student made AI-powered chatbot to answer all your student handbook related queries" />
+</svelte:head>
 
   <div class={`h-screen w-full flex flex-col transition-colors duration-200 ${$isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
     <header class="bg-[#006937] text-white py-6 px-4 shadow-lg relative">
