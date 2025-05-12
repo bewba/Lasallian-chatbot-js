@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { addMessage, messages } from '$lib/stores/chat.js';
   import { isDarkMode, toggleTheme } from '$lib/stores/theme.js';
-
+  import { marked } from 'marked';
 
   let input: string = '';
   let loading = false;
@@ -11,6 +11,7 @@
   let showPromptButtons = true;
   let brainrotMode = false;
   let outOfApiCalls = false;
+  
 
   const samplePrompts = [
     "What's the dress code policy?",
@@ -96,15 +97,15 @@
 
 
 <svelte:head>
-  <title>ArcherAsks</title>
-  <meta name="description" content="ArcherAsks - A student made AI-powered chatbot to answer all your student handbook related queries" />
+  <title>AnimoAsks</title>
+  <meta name="description" content="AnimoAsks - A student made AI-powered chatbot to answer all your student handbook related queries" />
   <link rel="icon" href="/favicon.ico" />
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="ArcherAsks" />
+    <meta property="og:title" content="AnimoAsks" />
     <meta property="og:description" content="A student-made AI chatbot answering questions from the Lasallian student handbook." />
-    <meta property="og:image" content="https://archerasks.vercel.app/chat/preview.png" />
-    <meta property="og:url" content="https://archerasks.vercel.app/" />
+    <meta property="og:image" content="https://animoasks.vercel.app/chat/preview.png" />
+    <meta property="og:url" content="https://animoasks.vercel.app/" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
@@ -121,13 +122,13 @@
     <div class="flex items-center gap-2 sm:gap-4">
       <!-- Terms -->
       <button on:click={() => showModal = true}
-        class="text-sm underline hover:text-green-200 whitespace-nowrap">
+        class="text-sm underline hover:text-green-200 whitespace-nowrap cursor-pointer">
         Terms & Conditions
       </button>
 
       <!-- Dark Mode Toggle -->
       <button on:click={toggleTheme}
-        class="p-2 rounded-lg hover:bg-[#005128] transition-colors duration-200"
+        class="p-2 rounded-lg hover:bg-[#005128] transition-colors duration-200 cursor-pointer"
         aria-label="Toggle theme">
         {#if $isDarkMode}
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -144,9 +145,9 @@
 
       <!-- Brainrot Toggle -->
       <button on:click={toggleBrainrotMode}
-        class="text-sm sm:text-md px-3 py-2 rounded-lg hover:bg-[#005128] transition-colors duration-200">
+        class="text-sm sm:text-md px-3 py-2 rounded-lg hover:bg-[#005128] transition-colors duration-200 cursor-pointer">
         {#if brainrotMode}
-          😎 Swag Mode
+          😎 Conyo Mode
         {:else}
           🧠 Nerd Mode
         {/if}
@@ -169,7 +170,9 @@
                 : ($isDarkMode 
                     ? 'bg-gray-700 text-white border border-[#00915c]' 
                     : 'bg-white border border-[#006937] text-gray-800')}`}>
-              <p class="whitespace-pre-wrap text-sm md:text-base leading-relaxed">{msg.content}</p>
+              <div class="prose dark:prose-invert max-w-none text-sm md:text-base leading-relaxed" use:htmlContent>
+                {@html marked.parse(msg.content)}
+              </div>              
             </div>
             {#if msg.role === 'user'}
               <div class="text-xl pt-1">👤</div>
@@ -267,6 +270,9 @@
           </ul>
         </div>
         <p>If you have questions or concerns, contact: <strong>hans_lumagui@dlsu.edu.ph</strong></p>
+        <strong class="italic text-xs">Disclaimer: Responses were created by generative AI and responses may be inaccurate.</strong>
+        <br>
+        <strong class="italic text-xs">Disclaimer: THIS IS NOT AN OFFICIAL DE LA SALLE UNIVERSITY CHATBOT.</strong>
         <p class="italic text-xs">Note from the creator: if this sucks, it’s cuz I speedran this.</p>
       </div>
     </div>
@@ -280,7 +286,7 @@
     <div class="bg-white dark:bg-gray-800 max-w-md w-full p-6 rounded-2xl shadow-xl relative animate-fadeIn">
       <h2 class="text-xl font-bold mb-4 text-red-600 dark:text-red-400">API Limit Reached</h2>
       <p class="text-sm leading-relaxed">
-        You've used up your available API calls for now. Please try again later, or contact the developer if you believe this is a mistake.
+        We have used up of our available API calls for now. Please try again later, or contact the developer if you believe this is a mistake.
       </p>
       <div class="mt-4 text-right">
         <button class="px-4 py-2 bg-[#006937] text-white rounded hover:bg-[#005128]" on:click={() => outOfApiCalls = false}>
