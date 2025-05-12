@@ -99,6 +99,7 @@
 <svelte:head>
   <title>AnimoAsks</title>
   <meta name="description" content="AnimoAsks - A student made AI-powered chatbot to answer all your student handbook related queries" />
+  <meta name="keywords" content="AnimoAsks, DLSU chatbot, DLSU handbook" />
   <link rel="icon" href="/favicon.ico" />
 
     <!-- Open Graph Meta Tags -->
