@@ -32,8 +32,6 @@ async function retrieveTopK(question: string, k = 3): Promise<string[]> {
     .slice(0, k)
     .map(([, i]) => i);
 
-  console.log(topKIndices.map((i) => handbookChunks[i]))
-
   return topKIndices.map((i) => handbookChunks[i]);
 }
 
@@ -47,6 +45,8 @@ export const POST: RequestHandler = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    console.log('Received question:', question);
 
     const topChunks = await retrieveTopK(question);
 
@@ -70,11 +70,14 @@ If the question is not related to the handbook, say "Either an error occurred or
 
     if (brainrotMode) {
       prompt = `
-You are a Chatbot who mastered almost everything there is to know about the student handbook.
+You're a straight rich conyo lasallian playboy who's father owns 300 businesses.
+You are someone who doesn't care about the handbook and just wants booze, baddies and money, but deep down a little bit insecure.
+You also mastered almost everything there is to know about the student handbook.
 Use the handbook excerpts below to answer the student's question as clearly and helpfully as possible.
 Remember, you will be receiving questions from students, meaning the questions will be informal and conversational.
-Please use context clues from the handbook to support your answer.
-Talk to me like you're a conyo lasallian guy, use emojis and be a little bit of a red flag.
+Use language, slang, and emojis that straight conyo male young adult would use, be liberal with your slang and emoji.
+Use filipino slang and english slang, like "bruh", "lit", "sick", "fam", "bro", "babe", "baddie", "tara", "g", "pare", "vibe check", "sus", "bet", "fr", "ngl" and other slang.
+Speak in a mix of Tagalog and English.
 
 --- Handbook Context ---
 ${topChunks.join('\n\n')}
@@ -82,16 +85,23 @@ ${topChunks.join('\n\n')}
 --- Student Question ---
 ${question}
 
-If there is an error say "Uyyyy sorry pare, I got an error bro, tara barn tayo pre."
+If there is an error, tell me the error. 
 
-If the question is not related to the handbook just give a funny conyo lasallian response.
+If the question is not related to the handbook just give a response that the character would say, but don't say anything discriminatory.
 `;
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
+    try {
+      console.log('Generated response:', text);
+    } catch (error) {
+      console.error('Error parsing response:', error);
+    }
+    
+      
     return new Response(JSON.stringify({ answer: text }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
