@@ -1,4 +1,4 @@
-# VISCA BARCA
+# VISCA BARCA; Release 1.1
 
 # ArcherAsks – Lasallian Handbook Assistant
 
