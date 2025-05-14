@@ -301,7 +301,6 @@
         </div>
         <p>Feel free to contact me for anything!</p>
         <p>I would love to hear all about your suggestions, user experience, and bugs</p>
-        <p class="italic text-xs">Also, Rinaldo, please stop trying to hack my website</p>
       </div>
     </div>
   </div>
