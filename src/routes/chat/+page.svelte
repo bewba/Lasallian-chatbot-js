@@ -8,6 +8,7 @@
   let loading = false;
   let chatContainer: HTMLDivElement;
   let showModal = false;
+  let showModal2 = false;
   let showPromptButtons = true;
   let brainrotMode = false;
   let outOfApiCalls = false;
@@ -153,6 +154,11 @@
           🧠 Nerd Mode
         {/if}
       </button>
+
+      <button on:click={() => showModal2 = true}
+        class="text-sm underline hover:text-green-200 whitespace-nowrap cursor-pointer">
+        Contact Me!
+      </button>
     </div>
   </div>
 </header>
@@ -225,7 +231,7 @@
       </div>
     </main>
 
-    {#if showModal}
+  {#if showModal}
   <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 sm:px-0">
     <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-2xl shadow-xl relative animate-fadeIn max-h-[90vh] overflow-y-auto">    
       <button class="absolute top-3 right-4 text-xl font-bold hover:text-red-500" on:click={() => showModal = false}>&times;</button>
@@ -277,6 +283,25 @@
         <br>
         <strong class="italic text-xs">Disclaimer: THIS IS NOT AN OFFICIAL DE LA SALLE UNIVERSITY CHATBOT.</strong>
         <p class="italic text-xs">Note from the creator: if this sucks, it’s cuz I speedran this.</p>
+      </div>
+    </div>
+  </div>
+{/if}
+
+
+{#if showModal2}
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 sm:px-0">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-2xl shadow-xl relative animate-fadeIn max-h-[90vh] overflow-y-auto">    
+      <button class="absolute top-3 right-4 text-xl font-bold hover:text-red-500" on:click={() => showModal2 = false}>&times;</button>
+      <h2 class="text-xl font-bold mb-4">Contact Me!</h2>
+      <div class="space-y-4 text-sm leading-relaxed">
+        <div>
+          <h3><strong>Email:</strong> hans_lumagui@dlsu.edu.ph</h3>
+          <h3><strong>Contact Number:</strong> 09270251730</h3>
+        </div>
+        <p>Feel free to contact me for anything!</p>
+        <p>I would love to hear all about your suggestions, user experience, and bugs</p>
+        <p class="italic text-xs">Also, Rinaldo, please stop trying to hack my website</p>
       </div>
     </div>
   </div>
