@@ -63,9 +63,9 @@ ${topChunks.join('\n\n')}
 --- Student Question ---
 ${question}
 
-If there is an error say "I errored, please try again, if the error persists, please try again later."
+If there is an error tell me the error.
 
-If the question is not related to the handbook, say "Either an error occurred or the question is not related to the handbook. Please try again later."
+
 `;
 
     if (brainrotMode) {
