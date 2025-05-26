@@ -241,7 +241,7 @@
     <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-2xl shadow-xl relative animate-fadeIn max-h-[90vh] overflow-y-auto">    
       <button class="absolute top-3 right-4 text-xl font-bold hover:text-red-500 cursor-pointer" on:click={() => showModal = false}>&times;</button>
       <h2 class="text-xl font-bold mb-4">Terms and Conditions</h2>
-      <p class="text-sm mb-4">Last updated: May 14, 2025</p>
+      <p class="text-sm mb-4">Last updated: May 26, 2025</p>
       <div class="space-y-4 text-sm leading-relaxed">
         <div>
           <h3 class="font-semibold">1. Use of the Service</h3>
