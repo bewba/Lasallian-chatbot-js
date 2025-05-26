@@ -4,6 +4,9 @@ import { pipeline } from '@xenova/transformers';
 import dotenv from 'dotenv';
 import { cosineSimilarity } from '$lib/util/mathisfrickingstupid.js';
 
+
+
+
 // Load chunks and embeddings
 import handbookChunks from '$lib/chunks/chunks.json' with { type: 'json' };
 import tralaleroTralala from '$lib/embeddings/embeddings.json' with { type: 'json' };
@@ -12,6 +15,13 @@ import tralaleroTralala from '$lib/embeddings/embeddings.json' with { type: 'jso
 const handbookEmbeddings: number[][] = tralaleroTralala as number[][];
 
 dotenv.config();
+
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(
+  process.env.PUBLIC_SUPABASE_URL,
+  process.env.PUBLIC_SUPABASE_ANON_KEY
+)
+
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 let extractor: any;
@@ -140,6 +150,17 @@ If the question is not related to the handbook just give a response that the cha
     } catch (error) {
       console.error('Error parsing response:', error);
     }
+
+    try {
+
+      console.log(typeof question,typeof text,typeof "LocalHost");
+
+      const { error } = await supabase
+  .from('Services')
+  .insert({ UserPrompt: question, AIResponse: text, Site: "AnimoAsks" });
+
+  console.log(error);
+    } catch (error) { console.error('Error inserting into Supabase:', error); }
 
     return new Response(JSON.stringify({ answer: text }), {
       status: 200,
