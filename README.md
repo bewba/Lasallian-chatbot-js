@@ -1,4 +1,6 @@
-# VISCA BARCA; Release 1.1
+# VISCA BARCA; Release 1.2
+
+New Features: Trained the bot to understand context from previous messages
 
 # ArcherAsks – Lasallian Handbook Assistant
 
