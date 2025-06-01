@@ -12,7 +12,7 @@
   let showModal = false;
   let showModal2 = false;
   let showPromptButtons = true;
-  let brainrotMode = false;
+  let brainrotMode = true;
   let outOfApiCalls = false;
   
 
@@ -154,9 +154,9 @@
       <button on:click={toggleBrainrotMode}
         class="text-sm sm:text-md px-3 py-2 rounded-lg hover:bg-[#005128] transition-colors duration-200 cursor-pointer">
         {#if brainrotMode}
-          😎 Conyo Mode
+          😎 Switch to Nerd Mode 
         {:else}
-          🧠 Nerd Mode
+          🧠 Switch to Conyo Mode
         {/if}
       </button>
 
