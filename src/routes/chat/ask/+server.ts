@@ -147,7 +147,7 @@ If the question is not related to the handbook just give a response that the cha
 
       const { error } = await supabase
   .from('Services')
-  .insert({ UserPrompt: question, AIResponse: text, Site: "AnimoAsks" });
+  .insert({ UserPrompt: question, AIResponse: text, Site: "Localhost" });
 
   console.log(error);
     } catch (error) { console.error('Error inserting into Supabase:', error); }
